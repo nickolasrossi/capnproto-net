@@ -945,7 +945,9 @@ namespace CapnProto
                 case Value.Unions.uint32: if (defaultValue.uint32 != 0) Write(" ^ ").WriteLiteral(defaultValue.uint32); break;
                 case Value.Unions.int64: if (defaultValue.int64 != 0) Write(" ^ ").WriteLiteral(defaultValue.int64); break;
                 case Value.Unions.uint64: if (defaultValue.uint64 != 0) Write(" ^ ").WriteLiteral(defaultValue.uint64); break;
-                default:
+				case Value.Unions.float32: if (defaultValue.float32 != 0) Write(" ^ ").WriteLiteral(defaultValue.float32); break;
+				case Value.Unions.float64: if (defaultValue.float64 != 0) Write(" ^ ").WriteLiteral(defaultValue.float64); break;
+				default:
                     throw new NotSupportedException("Default value not supported for: " + defaultValue.Union);
             }
             return this;
