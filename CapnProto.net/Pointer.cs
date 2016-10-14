@@ -938,7 +938,9 @@ namespace CapnProto
                 }
                 else if (segment.TryAllocate(words, out start))
                 { // in-segment pointer
-                    return new Pointer(segment, (uint)(start << 3) | (type & 7), dataAndWords, aux);
+					// write # of words and pointers into segment
+					if (start > 0) segment[start - 1] = (ulong)dataAndWords << 32;
+					return new Pointer(segment, (uint)(start << 3) | (type & 7), dataAndWords, aux);
                 }
                 else
                 {   // far pointer; will need the data and a header; ideally, in the same block
