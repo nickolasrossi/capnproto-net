@@ -921,7 +921,14 @@ namespace CapnProto
         public Pointer Allocate(short dataWords, short pointers)
         {
             uint newDataWordsAndPointers = ((uint)checked((ushort)dataWords)) | (((uint)checked((ushort)pointers)) << 16);
-            return Allocate(dataWords + pointers, Type.StructBasic, newDataWordsAndPointers, newDataWordsAndPointers, 0);
+			Pointer ptr = Allocate(dataWords + pointers, Type.StructBasic, newDataWordsAndPointers, newDataWordsAndPointers, 0);
+
+			// if this is the very first allocation, write # of words and pointers into the start of the segment
+			if (ptr.segment.Index == 0 && (ptr.startAndType >> 3) == 1) {
+				ptr.segment[0] = (ulong)newDataWordsAndPointers << 32;
+			}
+
+			return ptr;
         }
         private Pointer Allocate(int words, uint type, uint rhs, uint dataAndWords, uint aux)
         {
@@ -938,8 +945,6 @@ namespace CapnProto
                 }
                 else if (segment.TryAllocate(words, out start))
                 { // in-segment pointer
-					// write # of words and pointers into segment
-					if (start > 0) segment[start - 1] = (ulong)dataAndWords << 32;
 					return new Pointer(segment, (uint)(start << 3) | (type & 7), dataAndWords, aux);
                 }
                 else
